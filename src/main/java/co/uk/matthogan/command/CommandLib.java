@@ -23,60 +23,42 @@
  */
 package co.uk.matthogan.command;
 
-import lombok.Getter;
-
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandMap;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.SimplePluginManager;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.util.HashSet;
+import co.uk.matthogan.command.register.BukkitRegister;
+import co.uk.matthogan.command.register.BungeeRegister;
+import co.uk.matthogan.command.register.RegisterBase;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Matthew Hogan
  */
+@NoArgsConstructor
 public class CommandLib {
 
-    private Plugin plugin;
-    private CommandMap commandMap;
+    private org.bukkit.plugin.Plugin bukkitPlugin;
+    private net.md_5.bungee.api.plugin.Plugin bungeePlugin;
+    private RegisterBase platform;
 
-    @Getter
-    private HashSet<WrappedCommand> registeredCommands;
+    public CommandLib setupBukkit(org.bukkit.plugin.Plugin bukkitPlugin) {
+        this.bukkitPlugin = bukkitPlugin;
+        this.platform = new BukkitRegister(this);
+        this.platform.setup();
 
-    {
-        this.registeredCommands = new HashSet<>();
+        return this;
     }
 
-    public CommandLib(Plugin plugin) {
-        this.plugin = plugin;
+    public CommandLib setupBungeeCord(net.md_5.bungee.api.plugin.Plugin bungeePlugin) {
+        this.bungeePlugin = bungeePlugin;
+        this.platform = new BungeeRegister(this);
+        this.platform.setup();
 
-        try {
-            Field commandMap = SimplePluginManager.class.getDeclaredField("commandMap");
-            commandMap.setAccessible(true);
-
-            this.commandMap = (CommandMap) commandMap.get(Bukkit.getPluginManager());
-
-        } catch (NoSuchFieldException | IllegalAccessException exception) {
-            exception.printStackTrace();
-        }
+        return this;
     }
 
     public CommandLib register(Command command) {
-        for (Annotation annotation : command.getClass().getAnnotations()) {
-
-            // Check if we have the correct annotation
-            if (!DynamicCommand.class.isAssignableFrom(annotation.annotationType())) {
-                continue;
-            }
-
-            WrappedCommand wrappedCommand = new WrappedCommand(
-                    command, (DynamicCommand) annotation
-            );
-
-            this.commandMap.register(this.plugin.getName(), wrappedCommand);
-            this.registeredCommands.add(wrappedCommand);
+        if (this.bukkitPlugin != null) {
+            this.platform.registerCommand(command, this.bukkitPlugin);
+        } else {
+            this.platform.registerCommand(command, this.bungeePlugin);
         }
 
         return this;

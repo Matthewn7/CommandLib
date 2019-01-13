@@ -23,8 +23,6 @@
  */
 package co.uk.matthogan.command;
 
-import org.bukkit.command.CommandSender;
-
 import java.util.ArrayList;
 
 /**
@@ -32,9 +30,15 @@ import java.util.ArrayList;
  */
 public abstract class Command {
 
-    public abstract void execute(CommandSender sender, String... args);
+    public void execute(org.bukkit.command.CommandSender sender, String... args) {
+        ;
+    }
 
-    public ArrayList<String> tabComplete(CommandSender sender, String alias, String... args) {
+    public void execute(net.md_5.bungee.api.CommandSender sender, String... args) {
+        ;
+    }
+
+    public ArrayList<String> tabComplete(org.bukkit.command.CommandSender sender, String alias, String... args) {
         return new ArrayList<>();
     }
 }
