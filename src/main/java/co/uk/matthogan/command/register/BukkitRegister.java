@@ -104,6 +104,11 @@ public class BukkitRegister extends RegisterBase {
             }
 
             this.command.execute(sender, args);
+
+            // run the async execute
+            Plugin instance = BukkitRegister.super.commandLib.getBukkitPlugin();
+            this.command.executeAsync(sender, args).runTaskAsynchronously(instance);
+
             return true;
         }
 

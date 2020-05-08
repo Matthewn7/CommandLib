@@ -23,6 +23,8 @@
  */
 package co.uk.matthogan.command;
 
+import org.bukkit.scheduler.BukkitRunnable;
+
 import java.util.ArrayList;
 
 /**
@@ -36,6 +38,12 @@ public abstract class Command {
 
     public void execute(net.md_5.bungee.api.CommandSender sender, String... args) {
         ;
+    }
+
+    public BukkitRunnable executeAsync(org.bukkit.command.CommandSender sender, String... args) {
+        return new BukkitRunnable() {
+            @Override public void run() {}
+        };
     }
 
     public ArrayList<String> tabComplete(org.bukkit.command.CommandSender sender, String alias, String... args) {

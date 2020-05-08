@@ -12,7 +12,7 @@ import lombok.Getter;
 public abstract class RegisterBase {
 
     @Getter
-    private CommandLib commandLib;
+    protected CommandLib commandLib;
 
     public abstract void setup();
 

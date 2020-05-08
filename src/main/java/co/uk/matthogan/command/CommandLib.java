@@ -26,6 +26,7 @@ package co.uk.matthogan.command;
 import co.uk.matthogan.command.register.BukkitRegister;
 import co.uk.matthogan.command.register.BungeeRegister;
 import co.uk.matthogan.command.register.RegisterBase;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
@@ -34,6 +35,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CommandLib {
 
+    @Getter
     private org.bukkit.plugin.Plugin bukkitPlugin;
     private net.md_5.bungee.api.plugin.Plugin bungeePlugin;
     private RegisterBase platform;
