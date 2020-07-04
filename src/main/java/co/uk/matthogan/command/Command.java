@@ -67,6 +67,13 @@ public abstract class Command {
                         .collect(Collectors.toCollection(ArrayList::new))
                 );
             }
+        } else if (args.length > 1) {
+            String command = args[0];
+
+            if (this.containsSub(command)) {
+                String[] lessArgs = Arrays.copyOfRange(args, 1, args.length);
+                return this.sub.get(command).tabComplete(sender, alias, lessArgs);
+            }
         }
 
         return new ArrayList<>();
