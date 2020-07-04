@@ -23,14 +23,24 @@
  */
 package co.uk.matthogan.command;
 
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Matthew Hogan
  */
 public abstract class Command {
+
+    public void setup() {
+
+    }
 
     public void execute(org.bukkit.command.CommandSender sender, String... args) {
         ;
@@ -47,6 +57,54 @@ public abstract class Command {
     }
 
     public ArrayList<String> tabComplete(org.bukkit.command.CommandSender sender, String alias, String... args) {
+        if (args.length <= 1 && !this.sub.isEmpty()) {
+            if (args[0].isEmpty()) {
+                return this.tabSubCommands();
+            } else {
+                return (this.tabSubCommands()
+                        .stream()
+                        .filter(item -> item.toLowerCase().startsWith(args[0]))
+                        .collect(Collectors.toCollection(ArrayList::new))
+                );
+            }
+        }
+
         return new ArrayList<>();
+    }
+
+    private HashMap<String, Command> sub = new HashMap<>();
+
+    public void sub(String name, Command command) {
+        this.sub.put(name.toLowerCase(), command);
+    }
+
+    public boolean containsSub(String name) {
+        return this.sub.containsKey(name);
+    }
+
+    // Spigot only
+    public void processSubCommands(Player player, String[] args, Command help, Plugin instance) {
+        if (args.length < 1) {
+            return;
+        }
+
+        String arg = args[0];
+        Command command;
+
+        if (this.sub.containsKey(arg.toLowerCase())) {
+            command = this.sub.get(arg);
+        } else {
+            command = help;
+        }
+
+        // remove the sub command from the original arguments
+        args = Arrays.copyOfRange(args, 1, args.length);
+
+        command.execute(player, args);
+        command.executeAsync(player, args).runTaskAsynchronously(instance);
+    }
+
+    public ArrayList<String> tabSubCommands() {
+        return new ArrayList<>(this.sub.keySet());
     }
 }

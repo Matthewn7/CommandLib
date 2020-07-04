@@ -57,6 +57,8 @@ public class CommandLib {
     }
 
     public CommandLib register(Command command) {
+        command.setup();
+
         if (this.bukkitPlugin != null) {
             this.platform.registerCommand(command, this.bukkitPlugin);
         } else {
